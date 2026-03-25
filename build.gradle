@@ -1,0 +1,68 @@
+plugins {
+    id 'java'
+}
+
+group 'scorpio.core.rpc'
+version '1.0'
+
+repositories {
+    maven {
+        url 'https://maven.aliyun.com/repository/public/'
+    }
+    mavenCentral()
+}
+
+dependencies {
+    // Netty
+    implementation group: 'io.netty', name: 'netty-all', version: '4.1.116.Final'
+    
+    // Protocol Buffers
+    implementation group: 'com.google.protobuf', name: 'protobuf-java', version: '3.25.5'
+    implementation group: 'com.google.protobuf', name: 'protobuf-java-util', version: '3.25.5'
+    
+    // FastJSON
+    implementation group: 'com.alibaba', name: 'fastjson', version: '2.0.53'
+    
+    // Commons
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.17.0'
+    implementation group: 'org.apache.commons', name: 'commons-pool2', version: '2.12.0'
+    
+    // Logging
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.24.3'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.24.3'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.24.3'
+    
+    // Quartz (for scheduling)
+    implementation group: 'org.quartz-scheduler', name: 'quartz', version: '2.4.0'
+    
+    // Javassist (for code generation)
+    implementation group: 'org.javassist', name: 'javassist', version: '3.30.2-GA'
+    
+    testImplementation group: 'junit', name: 'junit', version: '4.13.2'
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = "UTF-8"
+}
+
+jar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    entryCompression = ZipEntryCompression.DEFLATED
+
+    manifest {
+        attributes 'Premain-Class':'scorpio.core.rpc.support.ClassReloader'
+        attributes 'Can-Redefine-Classes': true
+    }
+
+
+    // 只打包项目代码，不包含第三方依赖
+    // 第三方依赖由使用方提供
+//    from {
+//        configurations.runtimeClasspath.collect {
+//            it.isDirectory() ? it : zipTree(it)
+//        }
+//    }
+
+    archiveFileName = 'scorpio-rpc-1.0.jar'
+    zip64 true
+}
